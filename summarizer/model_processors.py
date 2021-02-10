@@ -6,7 +6,7 @@ from transformers import *
 from summarizer.bert_parent import BertParent
 from summarizer.cluster_features import ClusterFeatures
 from summarizer.sentence_handler import SentenceHandler
-
+from spacy.lang.en import English
 
 class ModelProcessor(object):
 
@@ -19,12 +19,12 @@ class ModelProcessor(object):
 
     def __init__(
         self,
+        sentence_handler: SentenceHandler,
         model: str = 'bert-large-uncased',
         custom_model: PreTrainedModel = None,
         custom_tokenizer: PreTrainedTokenizer = None,
         hidden: Union[List[int], int] = -2,
         reduce_option: str = 'mean',
-        sentence_handler: SentenceHandler = SentenceHandler(),
         random_state: int = 12345,
         hidden_concat: bool = False
     ):
@@ -229,12 +229,12 @@ class Summarizer(ModelProcessor):
 
     def __init__(
         self,
+        sentence_handler: SentenceHandler = SentenceHandler(language=English),
         model: str = 'bert-large-uncased',
         custom_model: PreTrainedModel = None,
         custom_tokenizer: PreTrainedTokenizer = None,
         hidden: Union[List[int], int] = -2,
         reduce_option: str = 'mean',
-        sentence_handler: SentenceHandler = SentenceHandler(),
         random_state: int = 12345,
         hidden_concat: bool = False
     ):
@@ -253,7 +253,7 @@ class Summarizer(ModelProcessor):
         """
 
         super(Summarizer, self).__init__(
-            model, custom_model, custom_tokenizer, hidden, reduce_option, sentence_handler, random_state, hidden_concat
+            sentence_handler, model, custom_model, custom_tokenizer, hidden, reduce_option, random_state, hidden_concat
         )
 
 
@@ -272,16 +272,17 @@ class TransformerSummarizer(ModelProcessor):
         'XLNet': (XLNetModel, XLNetTokenizer),
         'XLM': (XLMModel, XLMTokenizer),
         'DistilBert': (DistilBertModel, DistilBertTokenizer),
+        "Bert-ja": (BertModel, BertJapaneseTokenizer),
     }
 
     def __init__(
         self,
+        sentence_handler: SentenceHandler = SentenceHandler(language=English),
         transformer_type: str = 'Bert',
         transformer_model_key: str = 'bert-base-uncased',
         transformer_tokenizer_key: str = None,
         hidden: Union[List[int], int] = -2,
         reduce_option: str = 'mean',
-        sentence_handler: SentenceHandler = SentenceHandler(),
         random_state: int = 12345,
         hidden_concat: bool = False
     ):
@@ -303,5 +304,5 @@ class TransformerSummarizer(ModelProcessor):
         )
 
         super().__init__(
-            None, model, tokenizer, hidden, reduce_option, sentence_handler, random_state, hidden_concat
+            sentence_handler, None, model, tokenizer, hidden, reduce_option, random_state, hidden_concat
         )
